@@ -497,7 +497,7 @@ const qs = (data.questions || []).map(q => ({ ...q, normalizedType: normalizeTyp
             <div style={{ ...styles.card, textAlign: 'center' }}>
               <p style={{ color: '#555', fontSize: '0.8rem' }}>RESPOSTAS</p>
               <h2 style={{ margin: 0, color: '#4338ca', fontSize: '2.5rem' }}>
-                {Math.max(0, questions.reduce((acc, q) => acc + (q.responses?.length || 0), 0) - 1)}
+               {questions.length > 0 ? (questions[0].responses?.length || 0) : 0}
               </h2>
             </div>
           </aside>
