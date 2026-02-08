@@ -67,7 +67,7 @@ const handleFileChange = (idx, file) => {
     setIsGenerating(true);
 
     try {
- const res = await authFetch(`${API_BASE}/api/generate-ai`, {
+ const res = await authFetch(`${API_BASE}/api/polls/generate-ai`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ prompt: aiPrompt })
