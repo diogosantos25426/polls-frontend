@@ -10,8 +10,9 @@ export default function Register() {
   const [focusedField, setFocusedField] = useState(null);
   const navigate = useNavigate();
 
-  const API_BASE = `${window.location.protocol}//${window.location.hostname}:4000`;
-
+const API_BASE = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/api` 
+  : "http://localhost:4000/api";
   const styles = {
     wrapper: {
       height: "calc(100vh - 75px)",
