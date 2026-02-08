@@ -10,8 +10,7 @@ export default function LivePoll() {
   const [textInput, setTextInput] = useState("");
   const socketRef = useRef(null);
 
-  const API_BASE = `${window.location.protocol}//${window.location.hostname}:4000`;
-
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
   useEffect(() => {
     const socket = io(API_BASE, { 
       transports: ["websocket"],
