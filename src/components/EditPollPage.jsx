@@ -34,7 +34,7 @@ export default function EditPollPage() {
   useEffect(() => {
     async function fetchPollData() {
       try {
-        const res = await authFetch(`${API_BASE}/polls/${id}`);
+        const res = await authFetch(`${API_BASE}/api/polls/${id}`);
         const data = await res.json();
         
         const p = data.poll;
@@ -114,7 +114,7 @@ export default function EditPollPage() {
     e.preventDefault();
     try {
       // 1. Atualiza dados da sondagem (Route: PUT /:id)
-      await authFetch(`${API_BASE}/polls/${id}`, {
+      await authFetch(`${API_BASE}/api/polls/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, description, access, accessCode })
@@ -128,7 +128,7 @@ export default function EditPollPage() {
         settings: q.config || {} 
       }));
 
-      await authFetch(`${API_BASE}/polls/${id}/questions/sync`, {
+      await authFetch(`${API_BASE}/api/polls/${id}/questions/sync`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ questions: questionsToSync })
