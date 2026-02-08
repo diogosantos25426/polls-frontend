@@ -120,50 +120,36 @@ export default function EditPollPage() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-   try {
-    // 1. Atualiza dados básicos da sondagem
-    await authFetch(`${API_BASE}/polls/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        title, 
-        description, 
-        access, 
-        accessCode 
-      })
-    });
+    try {
+      await authFetch(`${API_BASE}/polls/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, description, mode, access, accessCode })
+      });
 
-    const questionsToSync = questions.map((q, index) => ({
-      type: q.type,
-      prompt: q.prompt,
-      position: index,
-      options: q.options.filter(opt => opt.trim() !== ""), // Remove opções vazias
-      settings: q.config || {} // O teu backend usa a coluna 'settings'
-    }));
+      await authFetch(`${API_BASE}/polls/${id}/questions/sync`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questions })
+      });
 
-    await authFetch(`${API_BASE}/polls/${id}/questions/sync`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ questions: questionsToSync })
-    });
-
-    setModal({
-      show: true,
-      title: "Sucesso",
-      message: "Sondagem atualizada com sucesso!",
-      type: "success",
-      onConfirm: () => navigate(`/polls/${id}/stats`)
-    });
-  } catch (err) {
-    console.error("Erro ao salvar:", err);
-    setModal({
-      show: true,
-      title: "Erro",
-      message: "Não foi possível guardar as alterações.",
-      type: "error"
-    });
-  }
-};
+      setModal({
+        show: true,
+        title: "Sucesso",
+        message: "Alterações guardadas!",
+        type: "success",
+        onConfirm: () => navigate(`/polls/${id}/stats`)
+      });
+    } catch (err) {
+      setModal({
+        show: true,
+        title: "Erro",
+        message: "Erro ao guardar.",
+        type: "error",
+        onConfirm: () => setModal({ show: false, title: "", message: "", type: "info", onConfirm: null, onCancel: null })
+      });
+    }
+  };
 
   if (loading) return <div style={styles.container}>Carregando...</div>;
 
