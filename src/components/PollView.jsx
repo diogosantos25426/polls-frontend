@@ -26,8 +26,7 @@ export default function PollView() {
   const socketRef = useRef(null);
   const chartRefs = useRef({});
 
-  const API_BASE = `${window.location.protocol}//${window.location.hostname}:4000`;
-
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
   // --- FUNÇÃO EXPORTAR CSV ---
   const exportCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,Pergunta,Resposta,Valor/Votos\n";
