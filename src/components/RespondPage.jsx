@@ -12,8 +12,7 @@ export default function RespondPage() {
   const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState({ show: false, title: "", message: "", type: "info", onConfirm: null, onCancel: null });
 
-  const API_BASE = `http://${window.location.hostname}:4000`;
-
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
   // Função para normalizar os tipos vindos da BD
   function normalizeType(type) {
     if (!type) return "";
