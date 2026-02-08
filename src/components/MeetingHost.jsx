@@ -27,8 +27,7 @@ export default function MeetingHost() {
   const [participantCount, setParticipantCount] = useState(0);
   const socketRef = useRef(null);
 const [isFinished, setIsFinished] = useState(false);
-  const API_BASE = `${window.location.protocol}//${window.location.hostname}:4000`;
-
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
