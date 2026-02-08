@@ -4,14 +4,42 @@ import { AuthContext } from "./AuthContext";
 export default function UserProfile() {
   const { user, token, updateUser } = useContext(AuthContext);
 
-  const [username, setUsername] = useState(user?.username || "");
-  const [email, setEmail] = useState(user?.email || "");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [saving, setSaving] = useState(false);
 
-   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
+  // Sincroniza os campos quando o user carrega do context
+  React.useEffect(() => {
+    if (user) {
+      setUsername(user.username || "");
+      setEmail(user.email || "");
+    }
+  }, [user]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user?.id) {
+      setFeedback({ type: "error", text: "ID de utilizador não encontrado." });
+      return;
+    }
+
+    setFeedback(null);
+    setSaving(true);
+
+    try {
+      // Ajuste na rota: plural 'users' ou singular 'user' conforme o teu backend
+      const res = await fetch(`${API_BASE}/api/users/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ username, email, password: password || undefined }),
+      });
 
   const styles = {
     wrapper: {
@@ -98,20 +126,6 @@ export default function UserProfile() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFeedback(null);
-    setSaving(true);
-
-    try {
-      const res = await fetch(`${API_BASE}/api/users/${user.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ username, email, password: password || undefined }),
-      });
 
       if (!res.ok) throw new Error("Erro ao atualizar perfil");
 
