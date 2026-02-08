@@ -18,7 +18,7 @@ export default function EditPollPage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState({ show: false, title: "", message: "", type: "info", onConfirm: null, onCancel: null });
 
-  const API_BASE = `http://localhost:4000/api`;
+  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   const styles = {
     container: { maxWidth: "900px", margin: "40px auto", padding: "40px", backgroundColor: "#111", borderRadius: "20px", color: "white", fontFamily: "sans-serif" },
