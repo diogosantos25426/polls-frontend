@@ -20,23 +20,27 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 const fetchMeetings = () => {
   setLoading(true);
-  const token = localStorage.getItem("token"); // Ou usa o contexto de Auth se preferires
-  
+  const token = localStorage.getItem("token");
+
   fetch(`${API_BASE}/api/meetings`, {
     headers: { 
       "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json"
     }
   })
-    .then(res => res.json())
-    .then(data => { 
-      // Se data for um erro do backend, define como array vazio para evitar crash
-      setMeetings(Array.isArray(data) ? data : []); 
-      setLoading(false); 
+    .then(res => {
+      if (!res.ok) throw new Error(`Erro servidor: ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      setMeetings(Array.isArray(data) ? data : (data.meetings || []));
     })
     .catch((err) => {
-      console.error("Erro ao carregar reuniões:", err);
-      setLoading(false);
+      console.error("Erro na ligação:", err);
+      // Aqui podes definir um erro para mostrar no ecrã se quiseres
+    })
+    .finally(() => {
+      setLoading(false); // ISTO GARANTE QUE O "A CARREGAR" DESAPARECE
     });
 };
 
