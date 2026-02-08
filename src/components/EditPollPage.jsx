@@ -162,25 +162,43 @@ export default function EditPollPage() {
                             value={q.type} 
                             onChange={e => updateQuestion(qIdx, "type", e.target.value)}
                           >
-                            <option value="multiple-choice">Múltipla Escolha</option>
-                            <option value="image_text">Texto com Imagem</option>
-                            <option value="scale">Escala (Likert)</option>
+                            <option value="multiple-choice">Escolha Múltipla</option>
+                            <option value="image_text">Texto + Imagem</option>
+                            <option value="scale">Escala </option>
                             <option value="word_cloud">Nuvem de Palavras</option>
                             <option value="open-ended">Resposta Aberta</option>
                           </select>
                         </div>
 
                         {/* EDITAR IMAGEM (Apenas se o tipo for image_text) */}
-                        {q.type === "image_text" && (
+                       {q.type === "image_text" && (
                           <div style={{ marginBottom: "20px", padding: "15px", background: "#222", borderRadius: "10px" }}>
-                            <label style={{ fontSize: "0.8rem", color: "#888" }}>URL DA IMAGEM</label>
-                            <input 
-                              style={{ ...styles.input, marginBottom: "10px" }} 
-                              value={q.imageUrl || ""} 
-                              onChange={e => updateQuestion(qIdx, "imageUrl", e.target.value)} 
-                              placeholder="https://exemplo.com/imagem.png"
-                            />
-                            {q.imageUrl && <img src={q.imageUrl} alt="Preview" style={styles.imagePreview} />}
+                            <label style={{ fontSize: "0.8rem", color: "#888", display: "block", marginBottom: "10px" }}>IMAGEM DA PERGUNTA</label>
+                            
+                            {!q.imageUrl ? (
+                              <label style={styles.fileInputCustom}>
+                                📷 Escolher Ficheiro
+                                <input 
+                                  type="file" 
+                                  accept="image/*" 
+                                  style={{ display: "none" }} 
+                                  onChange={e => handleImageUpload(qIdx, e.target.files[0])} 
+                                />
+                              </label>
+                            ) : (
+                              <div style={styles.imageContainer}>
+                                <img src={q.imageUrl} alt="Preview" style={styles.imagePreview} />
+                                <div style={{ marginTop: "10px" }}>
+                                  <button 
+                                    type="button" 
+                                    onClick={() => updateQuestion(qIdx, "imageUrl", "")} 
+                                    style={{ ...styles.removeBtn, fontSize: "0.8rem", width: "100%" }}
+                                  >
+                                    🗑️ Remover Imagem
+                                  </button>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
 
