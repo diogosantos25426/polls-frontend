@@ -25,8 +25,9 @@ export default function CreatePollPage() {
   const [qrDataUrl, setQrDataUrl] = useState(null);
   const [modal, setModal] = useState({ show: false, title: "", message: "", type: "info", onConfirm: null, onCancel: null });
 
-  const API_BASE = "http://localhost:4000/api";
-
+const API_BASE = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/api` 
+  : "http://localhost:4000/api";
   const styles = {
     container: { maxWidth: "900px", margin: "40px auto", padding: "40px", backgroundColor: "#050505", borderRadius: "20px", color: "white", fontFamily: "sans-serif" },
     input: { width: "100%", padding: "12px", margin: "10px 0 10px 0", backgroundColor: "#111", border: "1px solid #333", borderRadius: "8px", color: "white", fontSize: "1rem" },
