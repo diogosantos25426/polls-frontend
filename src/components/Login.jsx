@@ -17,7 +17,7 @@ export default function Login() {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "#7a2d2d",
+      backgroundColor: "#000000",
       color: "white",
       fontFamily: "sans-serif",
       padding: "20px"
