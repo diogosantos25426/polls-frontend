@@ -1,0 +1,59 @@
+.poll-list-container {
+  max-width: 900px;
+  margin-top: 100px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+.poll-list-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.loading,
+.empty {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1.2rem;
+  opacity: 0.7;
+}
+
+/* GRID DOS CARDS */
+.poll-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* CARD */
+.poll-card {
+  display: block;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  text-decoration: none;
+  color: #222;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+/* TITULO */
+.poll-card h3 {
+  margin: 0 0 10px;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* DESCRIÇÃO */
+.poll-description {
+  font-size: 0.95rem;
+  color: #666;
+}
+
+/* HOVER BONITO */
+.poll-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.18);
+}
