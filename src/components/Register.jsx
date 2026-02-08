@@ -118,7 +118,7 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
       const res = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, email, password })
       });
 
       if (!res.ok) {
