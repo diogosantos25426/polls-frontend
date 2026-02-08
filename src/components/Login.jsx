@@ -10,7 +10,7 @@ export default function Login() {
   const [focusedField, setFocusedField] = useState(null);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
   const styles = {
     wrapper: {
       height: "calc(100vh - 70px)",
@@ -107,8 +107,8 @@ export default function Login() {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:4000/api/auth/login", {
-        method: "POST",
+const res = await fetch(`${API_BASE}/api/auth/login`, {
+  method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
