@@ -7,7 +7,8 @@ export default function MeetingMode() {
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState({ show: false, title: "", message: "", type: "info", onConfirm: null, onCancel: null });
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
   const styles = {
     wrapper: { backgroundColor: "#050505", minHeight: "100vh", padding: "40px 20px", color: "white", fontFamily: "sans-serif" },
     card: { backgroundColor: "#111", padding: "20px", borderRadius: "12px", border: "1px solid #222", marginBottom: "15px", display: "flex", justifyContent: "space-between", alignItems: "center" },
@@ -18,31 +19,17 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
     btnDelete: { background: "#4338ca", color: "white", padding: "10px 15px", borderRadius: "8px", fontWeight: "bold", border: "none", cursor: "pointer" }
   };
 
-const fetchMeetings = () => {
-  setLoading(true);
-  const token = localStorage.getItem("token");
+  const fetchMeetings = () => {
+    setLoading(true);
+    fetch(`${API_BASE}/api/meetings`)
+      .then(res => res.json())
+      .then(data => { setMeetings(data); setLoading(false); })
+      .catch(() => setLoading(false));
+  };
 
-  fetch(`${API_BASE}/api/meetings`, {
-    headers: { 
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    }
-  })
-    .then(res => {
-      if (!res.ok) throw new Error(`Erro servidor: ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      setMeetings(Array.isArray(data) ? data : (data.meetings || []));
-    })
-    .catch((err) => {
-      console.error("Erro na ligação:", err);
-      // Aqui podes definir um erro para mostrar no ecrã se quiseres
-    })
-    .finally(() => {
-      setLoading(false); // ISTO GARANTE QUE O "A CARREGAR" DESAPARECE
-    });
-};
+  useEffect(() => {
+    fetchMeetings();
+  }, []);
 
   // --- FUNÇÃO PARA APAGAR REUNIÃO ---
   const handleDelete = async (e, id) => {
@@ -54,10 +41,7 @@ const fetchMeetings = () => {
       type: "confirm",
       onConfirm: async () => {
         try {
-          const res = await fetch(`${API_BASE}/api/meetings/${id}`, { 
-  method: "DELETE",
-  headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
-});
+          const res = await fetch(`${API_BASE}/api/meetings/${id}`, { method: "DELETE" });
           if (res.ok) {
             setModal({ show: false, title: "", message: "", type: "info", onConfirm: null, onCancel: null });
             fetchMeetings();
