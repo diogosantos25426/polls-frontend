@@ -18,17 +18,27 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
     btnDelete: { background: "#4338ca", color: "white", padding: "10px 15px", borderRadius: "8px", fontWeight: "bold", border: "none", cursor: "pointer" }
   };
 
-  const fetchMeetings = () => {
-    setLoading(true);
-    fetch(`${API_BASE}/api/meetings`)
-      .then(res => res.json())
-      .then(data => { setMeetings(data); setLoading(false); })
-      .catch(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    fetchMeetings();
-  }, []);
+const fetchMeetings = () => {
+  setLoading(true);
+  const token = localStorage.getItem("token"); // Ou usa o contexto de Auth se preferires
+  
+  fetch(`${API_BASE}/api/meetings`, {
+    headers: { 
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  })
+    .then(res => res.json())
+    .then(data => { 
+      // Se data for um erro do backend, define como array vazio para evitar crash
+      setMeetings(Array.isArray(data) ? data : []); 
+      setLoading(false); 
+    })
+    .catch((err) => {
+      console.error("Erro ao carregar reuniões:", err);
+      setLoading(false);
+    });
+};
 
   // --- FUNÇÃO PARA APAGAR REUNIÃO ---
   const handleDelete = async (e, id) => {
@@ -40,7 +50,10 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
       type: "confirm",
       onConfirm: async () => {
         try {
-          const res = await fetch(`${API_BASE}/api/meetings/${id}`, { method: "DELETE" });
+          const res = await fetch(`${API_BASE}/api/meetings/${id}`, { 
+  method: "DELETE",
+  headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+});
           if (res.ok) {
             setModal({ show: false, title: "", message: "", type: "info", onConfirm: null, onCancel: null });
             fetchMeetings();
