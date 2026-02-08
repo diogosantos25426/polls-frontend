@@ -67,11 +67,11 @@ const handleFileChange = (idx, file) => {
     setIsGenerating(true);
 
     try {
-      const res = await authFetch(`${API_BASE}/polls/generate-ai`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: aiPrompt })
-      });
+ const res = await authFetch(`${API_BASE}/api/polls/generate-ai`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ prompt: aiPrompt })
+});
       
       if (!res.ok) throw new Error("Erro na resposta do servidor.");
       const parsed = await res.json();
@@ -219,11 +219,11 @@ const handleSubmit = async (e) => {
       };
     });
 
-    const syncRes = await authFetch(`${API_BASE}/polls/${poll.id}/questions/sync`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ questions: formattedQuestions })
-    });
+    const syncRes = await authFetch(`${API_BASE}/api/polls/${poll.id}/questions/sync`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ questions: formattedQuestions })
+});
 
     if (!syncRes.ok) {
       const syncError = await syncRes.json();
