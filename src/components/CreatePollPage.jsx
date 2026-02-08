@@ -168,7 +168,7 @@ const handleSubmit = async (e) => {
 
   try {
     // 1. CRIAR A SONDAGEM (POLL)
-    const pollRes = await authFetch(`${API_BASE}/polls`, {
+    const pollRes = await authFetch(`${API_BASE}/api/polls`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
@@ -219,7 +219,7 @@ const handleSubmit = async (e) => {
       };
     });
 
-    const syncRes = await authFetch(`${API_BASE}/polls/${poll.id}/questions/sync`, {
+    const syncRes = await authFetch(`${API_BASE}/api/polls/${poll.id}/questions/sync`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ questions: formattedQuestions })
