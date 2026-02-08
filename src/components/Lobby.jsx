@@ -33,7 +33,7 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
     fetchPollData();
 
-    socketRef.current = io(API_BASE, { transports: ["websocket"] });
+    socketRef.current = io(API_BASE, { transports: ["websocket", "polling"] });
 
     // --- OS GATILHOS DE SAÍDA DO LOBBY ---
     
