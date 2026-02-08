@@ -11,12 +11,11 @@ export default function EditPollPage() {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [mode, setMode] = useState("individual");
   const [access, setAccess] = useState("public");
   const [accessCode, setAccessCode] = useState("");
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState({ show: false, title: "", message: "", type: "info", onConfirm: null, onCancel: null });
+  const [modal, setModal] = useState({ show: false, title: "", message: "", type: "info", onConfirm: null });
 
   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
@@ -37,19 +36,21 @@ export default function EditPollPage() {
       try {
         const res = await authFetch(`${API_BASE}/polls/${id}`);
         const data = await res.json();
+        
         const p = data.poll;
         setTitle(p.title);
         setDescription(p.description || "");
-        setMode(p.mode);
-        setAccess(p.access);
-        setAccessCode(p.accessCode || "");
+        setAccess(p.access || "public");
+        // Nota: No backend a coluna chama-se access_code
+        setAccessCode(p.access_code || "");
         
         const formattedQuestions = data.questions.map(q => ({
-          id: `q-${Math.random()}`, // Precisamos de IDs únicos e estáveis para o Drag and Drop
+          id: q.id ? `q-${q.id}` : `q-${Math.random()}`,
           prompt: q.prompt,
           type: q.type,
-          options: q.options ? q.options.map(o => o.text) : ["", ""],
-          config: q.config || { maxWords: 1 }
+          // Garante que options é um array de strings para o editor
+          options: q.options ? q.options.map(o => typeof o === 'string' ? o : o.text) : ["", ""],
+          config: q.settings || { maxWords: 1 }
         }));
         setQuestions(formattedQuestions);
       } catch (err) {
@@ -61,30 +62,21 @@ export default function EditPollPage() {
     fetchPollData();
   }, [id]);
 
-  // --- Lógica de Reordenação ---
   const onDragEnd = (result) => {
     if (!result.destination) return;
-
     const items = Array.from(questions);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
-
     setQuestions(items);
   };
 
-  // --- Lógica de Manipulação ---
   const addQuestion = () => {
-    setQuestions([...questions, { id: `q-${Date.now()}`, prompt: "", type: "multiple", options: ["", ""], config: { maxWords: 1 } }]);
+    setQuestions([...questions, { id: `q-${Date.now()}`, prompt: "", type: "multiple", options: ["", ""], config: {} }]);
   };
 
   const duplicateQuestion = (index) => {
     const qToCopy = questions[index];
-    const duplicated = { 
-      ...qToCopy, 
-      id: `q-${Date.now()}`, // Novo ID para a cópia
-      prompt: `${qToCopy.prompt} (Cópia)`,
-      options: [...qToCopy.options]
-    };
+    const duplicated = { ...qToCopy, id: `q-${Date.now()}`, prompt: `${qToCopy.prompt} (Cópia)`, options: [...qToCopy.options] };
     const newQuestions = [...questions];
     newQuestions.splice(index + 1, 0, duplicated);
     setQuestions(newQuestions);
@@ -121,32 +113,42 @@ export default function EditPollPage() {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
+      // 1. Atualiza dados da sondagem (Route: PUT /:id)
       await authFetch(`${API_BASE}/polls/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, mode, access, accessCode })
+        body: JSON.stringify({ title, description, access, accessCode })
       });
+
+      // 2. Sincroniza perguntas (Route: POST /:id/questions/sync)
+      // Ajustamos 'config' para 'settings' que é o que o teu backend espera
+      const questionsToSync = questions.map((q, idx) => ({
+        ...q,
+        position: idx,
+        settings: q.config || {} 
+      }));
 
       await authFetch(`${API_BASE}/polls/${id}/questions/sync`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ questions })
+        body: JSON.stringify({ questions: questionsToSync })
       });
 
       setModal({
         show: true,
         title: "Sucesso",
-        message: "Alterações guardadas!",
+        message: "Alterações guardadas com sucesso!",
         type: "success",
         onConfirm: () => navigate(`/polls/${id}/stats`)
       });
     } catch (err) {
+      console.error("Erro ao guardar:", err);
       setModal({
         show: true,
         title: "Erro",
-        message: "Erro ao guardar.",
+        message: "Falha ao comunicar com o servidor.",
         type: "error",
-        onConfirm: () => setModal({ show: false, title: "", message: "", type: "info", onConfirm: null, onCancel: null })
+        onConfirm: () => setModal({ ...modal, show: false })
       });
     }
   };
@@ -161,14 +163,15 @@ export default function EditPollPage() {
         message={modal.message}
         type={modal.type}
         onConfirm={modal.onConfirm}
-        onCancel={modal.onCancel}
         confirmText="OK"
-        cancelText="Cancelar"
       />
       <h1>Editar Sondagem</h1>
       <form onSubmit={handleSave}>
         <label>Título</label>
         <input style={styles.input} value={title} onChange={e => setTitle(e.target.value)} required />
+
+        <label>Descrição</label>
+        <input style={styles.input} value={description} onChange={e => setDescription(e.target.value)} />
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
           <div>
@@ -188,7 +191,6 @@ export default function EditPollPage() {
 
         <hr style={{ borderColor: "#222", margin: "30px 0" }} />
 
-        {/* ÁREA DE ARRASTAR */}
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="questions-list">
             {(provided) => (
@@ -202,11 +204,9 @@ export default function EditPollPage() {
                         style={{
                           ...styles.card,
                           ...provided.draggableProps.style,
-                          opacity: snapshot.isDragging ? 0.8 : 1,
-                          border: snapshot.isDragging ? "1px solid #6366f1" : "1px solid #333"
+                          opacity: snapshot.isDragging ? 0.8 : 1
                         }}
                       >
-                        {/* Pega aqui para arrastar */}
                         <div {...provided.dragHandleProps} style={styles.dragHandle}>
                           ⠿ Arrastar para reordenar
                         </div>
@@ -232,12 +232,11 @@ export default function EditPollPage() {
 
                         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "15px" }}>
                           <button type="button" onClick={() => duplicateQuestion(qIdx)} style={styles.buttonSecondary}>Duplicar</button>
-                          <button type="button" onClick={() => removeQuestion(qIdx)} style={styles.removeBtn}>Remover Pergunta</button>
+                          <button type="button" onClick={() => removeQuestion(qIdx)} style={styles.removeBtn}>Remover</button>
                         </div>
 
                         {["multiple", "ranking"].includes(q.type) && (
                           <div style={{ paddingLeft: "20px", borderLeft: "2px solid #333" }}>
-                            <label style={{ fontSize: "0.8rem", color: "#666" }}>OPÇÕES</label>
                             {q.options.map((opt, oIdx) => (
                               <div key={oIdx} style={styles.optionRow}>
                                 <input 
@@ -246,9 +245,7 @@ export default function EditPollPage() {
                                   onChange={e => updateOption(qIdx, oIdx, e.target.value)}
                                   placeholder={`Opção ${oIdx + 1}`}
                                 />
-                                {q.options.length > 1 && (
-                                  <button type="button" onClick={() => removeOption(qIdx, oIdx)} style={{ ...styles.removeBtn, padding: "0 10px" }}>×</button>
-                                )}
+                                <button type="button" onClick={() => removeOption(qIdx, oIdx)} style={{ ...styles.removeBtn, padding: "0 10px" }}>×</button>
                               </div>
                             ))}
                             <button type="button" onClick={() => addOption(qIdx)} style={{ ...styles.buttonPrimary, fontSize: "0.8rem", background: "#333" }}>+ Adicionar Opção</button>
