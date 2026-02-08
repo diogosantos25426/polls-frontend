@@ -114,7 +114,7 @@ export default function EditPollPage() {
     e.preventDefault();
     try {
       // 1. Atualiza dados da sondagem (Route: PUT /:id)
-      await authFetch(`${API_BASE}/api/polls/${id}`, {
+      await authFetch(`${API_BASE}/api/poll/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, description, access, accessCode })
