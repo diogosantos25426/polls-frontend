@@ -25,8 +25,8 @@ export default function CreatePollPage() {
   const [qrDataUrl, setQrDataUrl] = useState(null);
   const [modal, setModal] = useState({ show: false, title: "", message: "", type: "info", onConfirm: null, onCancel: null });
 
-// Substitui a linha antiga por esta:
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
   const styles = {
     container: { maxWidth: "900px", margin: "40px auto", padding: "40px", backgroundColor: "#050505", borderRadius: "20px", color: "white", fontFamily: "sans-serif" },
     input: { width: "100%", padding: "12px", margin: "10px 0 10px 0", backgroundColor: "#111", border: "1px solid #333", borderRadius: "8px", color: "white", fontSize: "1rem" },
@@ -168,7 +168,7 @@ const handleSubmit = async (e) => {
 
   try {
     // 1. CRIAR A SONDAGEM (POLL)
-    const pollRes = await authFetch(`${API_BASE}/api/polls`, {
+    const pollRes = await authFetch(`${API_BASE}/polls`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
@@ -219,7 +219,7 @@ const handleSubmit = async (e) => {
       };
     });
 
-    const syncRes = await authFetch(`${API_BASE}/api/polls/${poll.id}/questions/sync`, {
+    const syncRes = await authFetch(`${API_BASE}/polls/${poll.id}/questions/sync`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ questions: formattedQuestions })
