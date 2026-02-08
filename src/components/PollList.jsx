@@ -75,19 +75,27 @@ export default function PollList() {
     })
   };
 
-  const load = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/polls`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      setPolls(data);
-    } catch (err) {
-      console.error("Erro ao carregar:", err);
-    } finally {
-      setLoading(false);
+const load = async () => {
+  try {
+    console.log("A carregar de:", `${API_BASE}/api/polls`);
+    const res = await fetch(`${API_BASE}/api/polls`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    if (!res.ok) {
+      console.error("Resposta do servidor não foi OK:", res.status);
+      return;
     }
-  };
+
+    const data = await res.json();
+    console.log("Dados recebidos do Backend:", data); // ISTO É O MAIS IMPORTANTE
+    setPolls(data);
+  } catch (err) {
+    console.error("Erro fatal no fetch:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     if (token) load();
