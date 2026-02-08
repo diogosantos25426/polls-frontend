@@ -1,45 +1,26 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "./AuthContext";
 
 export default function UserProfile() {
   const { user, token, updateUser } = useContext(AuthContext);
 
+  // Inicializamos vazios e usamos o useEffect para sincronizar
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+  // Mantive a lógica do VITE_API_URL para produção, com o teu fallback atual
+  const API_BASE = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:4000`;
 
-  // Sincroniza os campos quando o user carrega do context
-  React.useEffect(() => {
+  // IMPORTANTE: Sincroniza os inputs quando o utilizador vindo do Context mudar
+  useEffect(() => {
     if (user) {
       setUsername(user.username || "");
       setEmail(user.email || "");
     }
   }, [user]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!user?.id) {
-      setFeedback({ type: "error", text: "ID de utilizador não encontrado." });
-      return;
-    }
-
-    setFeedback(null);
-    setSaving(true);
-
-    try {
-      // Ajuste na rota: plural 'users' ou singular 'user' conforme o teu backend
-      const res = await fetch(`${API_BASE}/api/users/${user.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ username, email, password: password || undefined }),
-      });
 
   const styles = {
     wrapper: {
@@ -126,11 +107,37 @@ export default function UserProfile() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user?.id) {
+      setFeedback({ type: "error", text: "Erro: Utilizador não identificado." });
+      return;
+    }
 
-      if (!res.ok) throw new Error("Erro ao atualizar perfil");
+    setFeedback(null);
+    setSaving(true);
 
-      const updatedUser = await res.json();
-      updateUser(updatedUser);
+    try {
+      // Nota: Enviamos 'username', 'email' e 'password'. 
+      // O teu backend deve receber 'password' e converter para 'password_hash' antes de salvar.
+      const res = await fetch(`${API_BASE}/api/users/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ 
+          username, 
+          email, 
+          password: password || undefined 
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Erro ao atualizar perfil");
+
+      updateUser(data); // Assume que o backend retorna o user atualizado
       setPassword("");
       setFeedback({ type: "success", text: "Alterações guardadas com sucesso!" });
     } catch (err) {
@@ -144,7 +151,7 @@ export default function UserProfile() {
     <div style={styles.wrapper}>
       <div style={styles.container}>
         <div style={styles.avatarPlaceholder}>
-          {username.charAt(0).toUpperCase()}
+          {username ? username.charAt(0).toUpperCase() : "?"}
         </div>
         
         <h2 style={styles.title}>Definições de Perfil</h2>
@@ -162,8 +169,6 @@ export default function UserProfile() {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            onFocus={(e) => e.target.style.borderColor = "#6366f1"}
-            onBlur={(e) => e.target.style.borderColor = "#333"}
             required
           />
 
@@ -173,8 +178,6 @@ export default function UserProfile() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            onFocus={(e) => e.target.style.borderColor = "#6366f1"}
-            onBlur={(e) => e.target.style.borderColor = "#333"}
             required
           />
 
@@ -185,21 +188,19 @@ export default function UserProfile() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Deixe em branco para manter a atual"
-            onFocus={(e) => e.target.style.borderColor = "#6366f1"}
-            onBlur={(e) => e.target.style.borderColor = "#333"}
           />
 
           <button 
-            style={{...styles.btn, opacity: saving ? 0.7 : 1}} 
+            style={{...styles.btn, opacity: (saving || !user) ? 0.7 : 1}} 
             type="submit" 
-            disabled={saving}
+            disabled={saving || !user}
           >
             {saving ? "A guardar..." : "Atualizar Perfil"}
           </button>
         </form>
         
         <p style={{ textAlign: "center", color: "#444", fontSize: "0.8rem", marginTop: "20px" }}>
-          ID de Utilizador: #{user?.id}
+          ID de Utilizador: #{user?.id || "---"}
         </p>
       </div>
     </div>
