@@ -10,7 +10,8 @@ export default function UserProfile() {
   const [feedback, setFeedback] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const API_BASE = `${window.location.protocol}//${window.location.hostname}:4000`;
+   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
 
   const styles = {
     wrapper: {
