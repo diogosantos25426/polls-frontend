@@ -7,8 +7,7 @@ export default function MeetingMode() {
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState({ show: false, title: "", message: "", type: "info", onConfirm: null, onCancel: null });
-  const API_BASE = `${window.location.protocol}//${window.location.hostname}:4000`;
-
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
   const styles = {
     wrapper: { backgroundColor: "#050505", minHeight: "100vh", padding: "40px 20px", color: "white", fontFamily: "sans-serif" },
     card: { backgroundColor: "#111", padding: "20px", borderRadius: "12px", border: "1px solid #222", marginBottom: "15px", display: "flex", justifyContent: "space-between", alignItems: "center" },
