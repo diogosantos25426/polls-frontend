@@ -139,7 +139,7 @@ export default function EditPollPage() {
         title: "Sucesso",
         message: "Alterações guardadas com sucesso!",
         type: "success",
-        onConfirm: () => navigate(`/polls/${id}/stats`)
+        onConfirm: () => navigate(`/poll/${id}`)
       });
     } catch (err) {
       console.error("Erro ao guardar:", err);
