@@ -140,16 +140,7 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
             return (
               <div key={q.id} style={cardStyle}>
            {/* Bloco de Imagem Dinâmico */}
-    {imageUrl && (
-      <div style={{ marginBottom: '20px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #333', backgroundColor: '#000' }}>
-        <img 
-          src={imageUrl} 
-          alt="Conteúdo Visual" 
-          style={{ width: '100%', display: 'block', maxHeight: '400px', objectFit: 'contain' }} 
-        />
-      </div>
-    )}
-
+   
     <h3 style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
       <span style={{ color: '#6366f1' }}>{idx + 1}.</span>
       {/* Se for image_text, usamos o content, caso contrário o prompt normal */}
