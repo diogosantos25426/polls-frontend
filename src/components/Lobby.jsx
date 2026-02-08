@@ -14,7 +14,7 @@ export default function Lobby() {
   const [loading, setLoading] = useState(true);
 
   const socketRef = useRef(null);
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
   useEffect(() => {
     async function fetchPollData() {
       try {
@@ -33,7 +33,7 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
     fetchPollData();
 
-    socketRef.current = io(API_BASE, { transports: ["websocket", "polling"] });
+    socketRef.current = io(API_BASE, { transports: ["websocket"] });
 
     // --- OS GATILHOS DE SAÍDA DO LOBBY ---
     
