@@ -121,21 +121,7 @@ export default function EditPollPage() {
         <label>Título</label>
         <input style={styles.input} value={title} onChange={e => setTitle(e.target.value)} required />
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-          <div>
-            <label>Acesso</label>
-            <select style={styles.input} value={access} onChange={e => setAccess(e.target.value)}>
-              <option value="public">Público</option>
-              <option value="code">Código Privado</option>
-            </select>
-          </div>
-          {access === "code" && (
-            <div>
-              <label>Código de Acesso</label>
-              <input style={styles.input} value={accessCode} onChange={e => setAccessCode(e.target.value)} required />
-            </div>
-          )}
-        </div>
+
 
         <hr style={{ borderColor: "#222", margin: "30px 0" }} />
 
